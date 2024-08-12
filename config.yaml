@@ -1,0 +1,7 @@
+databaseconfig:
+- charset: utf8
+  db: iowtb_wms_test
+  host: 192.168.111.232
+  password: Zhqc_123!
+  port: 3306
+  user: root
