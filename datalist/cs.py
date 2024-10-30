@@ -1,6 +1,26 @@
-from common import read_yaml, base_path
+res = {'key': 'null', 'companyCode': None, 'whId': None, 'id': None, 'remark': None, 'createTime': None,
+       'creator': None, 'creatorName': None, 'updateTime': None, 'updater': None, 'updaterName': None,
+       'createTimeStr': None, 'updateTimeStr': None,
+       'baseSku': {'skuId': 1825502431040000, 'skuCode': 'M123321', 'barcode': '01000101010000', 'skuName': '维生素A',
+                   'skuCategoryId': None, 'skuCategoryName': '药品', 'skuCategoryCode': None,
+                   'skuBigCategoryCode': None, 'skuBigCategoryName': None, 'spec': '50g', 'mainUnit': '瓶',
+                   'perQty': 100, 'originCountry': '山东省青岛市市北区昆明路', 'drugForm': '_', 'tradeName': '维生素A',
+                   'approvalNumber': '国药准字维生素A', 'brandName': '', 'mfgName': None, 'mfg': None,
+                   'permitHolder': '', 'tempControl': 'CW', 'validityDay': 0, 'tempControlName': '常温',
+                   'tempMax': None, 'tempMin': None, 'mnemonicCode': None, 'instrumentModel': None},
+       'baseInvBatch': {'batchNo': 'P24080900003', 'productionBatch': '20240809002', 'productionDate': '2024-01',
+                        'instoreDate': '2024-07-01', 'invalidDate': '2024-12', 'sterileInvaliDate': '', 'sterileNo': '',
+                        'asnNo': None, 'batchAsnNo': None, 'po': None, 'perQty': 100, 'unitPrice': None,
+                        'spellBoxSign': None, 'volume': None, 'weight': None, 'packQty': None},
+       'stockInfoId': 1863827683234304, 'supplierId': 1838234556355072, 'batchNo': 'P24080900003',
+       'maintainVarietiesDtId': None, 'qty': 5.0, 'zoneCode': 'KQBM01', 'zoneName': '01零货库区', 'qualityStatus': None,
+       'lotCode': 'LH0009', 'skuId': 1825502431040000, 'supplierCode': None, 'emphMaintainNo': None,
+       'stockStatus': 'HG', 'confirmTime': None, 'maintainUserName': None, 'lineNum': None, 'inStockDay': 50,
+       'batchInStockDay': 11, 'batchInstoreDate': '2024-08-09', 'subPackagingEnterprise': None,
+       'emphMaintainType': None, 'skuCode': 'M123321', 'orgId': 1770560509055488, 'orgName': '零售事业部',
+       'nextMaintainTime': '2024-07-02', 'lastMaintainTime': None, 'maintainConfirmDate': None,
+       'nextProMaintainTime': None, 'zoneGroup': None, 'zoneGroupName': None, 'tempCondition': None,
+       'categoryName': None, 'stockStatusName': '合格', 'emphMaintainTypeName': ''}
 
-
-print(base_path("config.yaml"))
-
-print(read_yaml(file_path=base_path("config.yaml"),key="databaseconfig",value="host"))
+for  i in res:
+    print(i)

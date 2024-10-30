@@ -1,3 +1,6 @@
+company_data:
+- company_name: 智汇奇策
+  warehouse_name: 默认仓库
 databaseconfig:
 - charset: utf8
   db: iowtb_wms_test
@@ -5,3 +8,11 @@ databaseconfig:
   password: Zhqc_123!
   port: 3306
   user: root
+default_out_data:
+- out_order_num: 1
+  product_num: 20240812001
+  sku_name: 氨糖
+ip_host: 192.168.111.232:17777
+login_data:
+- password: lhx7758521
+  username: lhb001

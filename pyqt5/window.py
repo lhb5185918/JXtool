@@ -10,20 +10,30 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from common import chinese_to_initials, CommonDatabase, strip_control, read_yaml, base_path, write_yaml
-from datalist.data import rk_body, select_data, asn_data, ys_data, sj, so_data
+from datalist.data import rk_body, select_data, asn_data, ys_data, sj, so_data, yh_data_list, fj_data, get_bhg_data
 import requests
 import json
 from datalist.ceshi import TestRunerWindow
+import time
+
+
+class Worker(QtCore.QThread):
+    progress = QtCore.pyqtSignal(int)  # 定义信号以更新进度
+    finished = QtCore.pyqtSignal(str)  # 定义完成信号
+
+    def run(self, task_type):
+        # 模拟不同任务的执行
+        pass
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1117, 796)
+        MainWindow.resize(1162, 797)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 70, 249, 170))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(30, 70, 249, 196))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -87,6 +97,11 @@ class Ui_MainWindow(object):
         self.orderclass.addItem("")
         self.horizontalLayout_2.addWidget(self.orderclass)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.progressBar = QtWidgets.QProgressBar(self.verticalLayoutWidget)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setObjectName("progressBar")
+        self.verticalLayout.addWidget(self.progressBar)
+        self.progressBar.hide()
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.rkorder = QtWidgets.QPushButton(self.verticalLayoutWidget)
@@ -114,11 +129,11 @@ class Ui_MainWindow(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.listView = QtWidgets.QListView(self.centralwidget)
-        self.listView.setGeometry(QtCore.QRect(0, 40, 271, 201))
+        self.listView.setGeometry(QtCore.QRect(1, 40, 300, 280))
         self.listView.setStyleSheet("background-color: rgb(201, 224, 255);")
         self.listView.setObjectName("listView")
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(310, 70, 332, 167))
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(330, 74, 271, 191))
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -131,6 +146,7 @@ class Ui_MainWindow(object):
         self.outsku = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
         self.outsku.setObjectName("outsku")
         self.horizontalLayout_21.addWidget(self.outsku)
+        self.outsku.setText(str(read_yaml(base_path("config.yaml"), key="default_out_data", value="sku_name"))),
         self.verticalLayout_2.addLayout(self.horizontalLayout_21)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -140,6 +156,7 @@ class Ui_MainWindow(object):
         self.outorder = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
         self.outorder.setObjectName("outorder")
         self.horizontalLayout_4.addWidget(self.outorder)
+        self.outorder.setText(str(read_yaml(base_path("config.yaml"), key="default_out_data", value="out_order_num"))),
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
@@ -149,6 +166,7 @@ class Ui_MainWindow(object):
         self.lineEdit = QtWidgets.QLineEdit(self.verticalLayoutWidget_2)
         self.lineEdit.setObjectName("lineEdit")
         self.horizontalLayout_8.addWidget(self.lineEdit)
+        self.lineEdit.setText(str(read_yaml(base_path("config.yaml"), key="default_out_data", value="product_num"))),
         self.verticalLayout_2.addLayout(self.horizontalLayout_8)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
@@ -173,6 +191,11 @@ class Ui_MainWindow(object):
         self.outworkclass.addItem("")
         self.horizontalLayout_7.addWidget(self.outworkclass)
         self.verticalLayout_2.addLayout(self.horizontalLayout_7)
+        self.progressBar_2 = QtWidgets.QProgressBar(self.verticalLayoutWidget_2)
+        self.progressBar_2.setProperty("value", 0)
+        self.progressBar_2.setObjectName("progressBar_2")
+        self.verticalLayout_2.addWidget(self.progressBar_2)
+        self.progressBar_2.hide()
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.so = QtWidgets.QPushButton(self.verticalLayoutWidget_2)
@@ -205,7 +228,7 @@ class Ui_MainWindow(object):
         self.label_6.setFont(font)
         self.label_6.setObjectName("label_6")
         self.listView_2 = QtWidgets.QListView(self.centralwidget)
-        self.listView_2.setGeometry(QtCore.QRect(300, 40, 351, 201))
+        self.listView_2.setGeometry(QtCore.QRect(320, 40, 300, 280))
         self.listView_2.setStyleSheet("background-color: rgb(201, 224, 255);")
         self.listView_2.setObjectName("listView_2")
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
@@ -214,6 +237,7 @@ class Ui_MainWindow(object):
         self.host = QtWidgets.QLineEdit(self.centralwidget)
         self.host.setGeometry(QtCore.QRect(60, 10, 113, 20))
         self.host.setObjectName("host")
+        self.host.setText(str(read_yaml(file_path=base_path("config.yaml"), key="ip_host")))
         self.listView_3 = QtWidgets.QListView(self.centralwidget)
         self.listView_3.setGeometry(QtCore.QRect(790, 250, 311, 201))
         self.listView_3.setStyleSheet("background-color: rgb(208, 208, 208);")
@@ -279,7 +303,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10.addWidget(self.label_11)
         self.password = QtWidgets.QLineEdit(self.verticalLayoutWidget_4)
         self.password.setObjectName("password")
-        self.password.setText(str(read_yaml(base_path('config.yaml'), key='databaseconfig', value='password')))
+        # self.password.setText(str(read_yaml(base_path('config.yaml'), key='databaseconfig', value='password')))
         self.horizontalLayout_10.addWidget(self.password)
         self.verticalLayout_4.addLayout(self.horizontalLayout_10)
         self.pushButton = QtWidgets.QPushButton(self.verticalLayoutWidget_4)
@@ -300,6 +324,7 @@ class Ui_MainWindow(object):
         self.login_wms_username = QtWidgets.QLineEdit(self.verticalLayoutWidget_3)
         self.login_wms_username.setObjectName("login_username")
         self.horizontalLayout_12.addWidget(self.login_wms_username)
+        # self.login_wms_username.setText(str(read_yaml(base_path('config.yaml'), key='login_data', value='username')))
         self.verticalLayout_3.addLayout(self.horizontalLayout_12)
         self.horizontalLayout_13 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_13.setObjectName("horizontalLayout_13")
@@ -310,6 +335,7 @@ class Ui_MainWindow(object):
         self.login_wms_password.setEnabled(True)
         self.login_wms_password.setObjectName("login_password")
         self.horizontalLayout_13.addWidget(self.login_wms_password)
+        self.password.setText(str(read_yaml(base_path('config.yaml'), key='login_data', value='password')))
         self.verticalLayout_3.addLayout(self.horizontalLayout_13)
         self.horizontalLayout_14 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_14.setObjectName("horizontalLayout_14")
@@ -355,14 +381,121 @@ class Ui_MainWindow(object):
         self.label_23.setFont(font)
         self.label_23.setObjectName("label_23")
         self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setGeometry(QtCore.QRect(860, 490, 158, 23))
+        self.pushButton_4.setGeometry(QtCore.QRect(910, 490, 158, 23))
         self.pushButton_4.setStyleSheet("background-color: rgb(161, 161, 161);")
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.clicked.connect(self.open_test_runer)
         self.listView_5 = QtWidgets.QListView(self.centralwidget)
-        self.listView_5.setGeometry(QtCore.QRect(830, 460, 211, 91))
+        self.listView_5.setGeometry(QtCore.QRect(890, 460, 211, 91))
         self.listView_5.setStyleSheet("background-color: rgb(85, 170, 255);")
         self.listView_5.setObjectName("listView_5")
+        self.listView_6 = QtWidgets.QListView(self.centralwidget)
+        self.listView_6.setGeometry(QtCore.QRect(0, 330, 300, 280))
+        self.listView_6.setStyleSheet("background-color: rgb(201, 224, 255);")
+        self.listView_6.setObjectName("listView_6")
+        self.label_21 = QtWidgets.QLabel(self.centralwidget)
+        self.label_21.setGeometry(QtCore.QRect(10, 340, 54, 12))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_21.setFont(font)
+        self.label_21.setObjectName("label_21")
+        self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 380, 291, 41))
+        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
+        self.horizontalLayout_22 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
+        self.horizontalLayout_22.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_22.setObjectName("horizontalLayout_22")
+        self.getyhdata = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.getyhdata.setStyleSheet("background-color: rgb(85, 170, 255);")
+        self.getyhdata.setObjectName("getyhdata")
+        self.getyhdata.clicked.connect(self.populate_yh_combobox)
+        self.horizontalLayout_22.addWidget(self.getyhdata)
+        self.yhdata = QtWidgets.QComboBox(self.horizontalLayoutWidget)
+        self.yhdata.setObjectName("yhdata")
+        if self.get_yh_data() is not None:
+            for yh_result in self.get_yh_data():
+                self.yhdata.addItem("")
+        self.horizontalLayout_22.addWidget(self.yhdata)
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.pushyh = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.pushyh.setObjectName("pushyh")
+        self.verticalLayout_5.addWidget(self.pushyh)
+        self.pushyh.clicked.connect(self.show_message)
+        self.horizontalLayout_22.addLayout(self.verticalLayout_5)
+        self.label_24 = QtWidgets.QLabel(self.centralwidget)
+        self.label_24.setGeometry(QtCore.QRect(0, 360, 91, 16))
+        self.label_24.setObjectName("label_24")
+        self.label_25 = QtWidgets.QLabel(self.centralwidget)
+        self.label_25.setGeometry(QtCore.QRect(0, 430, 91, 16))
+        self.label_25.setObjectName("label_25")
+        self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
+        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(0, 450, 291, 41))
+        self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
+        self.horizontalLayout_23 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.horizontalLayout_23.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_23.setObjectName("horizontalLayout_23")
+        self.getfjdata = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.getfjdata.setStyleSheet("background-color: rgb(85, 170, 255);")
+        self.getfjdata.setObjectName("getfjdata")
+        self.horizontalLayout_23.addWidget(self.getfjdata)
+        self.getfjdata.clicked.connect(self.populate_fj_combobox)
+        self.fjdata = QtWidgets.QComboBox(self.horizontalLayoutWidget_2)
+        self.fjdata.setObjectName("fjdata")
+        if self.get_fj_data() is not None:
+            for fj_result in self.get_fj_data():
+                self.fjdata.addItem("")
+        self.horizontalLayout_23.addWidget(self.fjdata)
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.pushfj = QtWidgets.QPushButton(self.horizontalLayoutWidget_2)
+        self.pushfj.setObjectName("pushfj")
+        self.verticalLayout_6.addWidget(self.pushfj)
+        self.pushfj.clicked.connect(self.show_message)
+        self.horizontalLayout_23.addLayout(self.verticalLayout_6)
+        self.label_26 = QtWidgets.QLabel(self.centralwidget)
+        self.label_26.setGeometry(QtCore.QRect(0, 500, 91, 16))
+        self.label_26.setObjectName("label_26")
+        self.horizontalLayoutWidget_3 = QtWidgets.QWidget(self.centralwidget)
+        self.horizontalLayoutWidget_3.setGeometry(QtCore.QRect(0, 520, 291, 41))
+        self.horizontalLayoutWidget_3.setObjectName("horizontalLayoutWidget_3")
+        self.horizontalLayout_24 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_3)
+        self.horizontalLayout_24.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_24.setObjectName("horizontalLayout_24")
+        self.getbhgdata = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.getbhgdata.setStyleSheet("background-color: rgb(85, 170, 255);")
+        self.getbhgdata.setObjectName("getbhgdata")
+        self.horizontalLayout_24.addWidget(self.getbhgdata)
+        self.bhgdata = QtWidgets.QComboBox(self.horizontalLayoutWidget_3)
+        self.getbhgdata.clicked.connect(self.populate_bhg_combobox)
+        self.bhgdata.setObjectName("bhgdata")
+        if self.get_bhg_data() is not None:
+            for bhg_result in self.get_bhg_data():
+                self.bhgdata.addItem("")
+        self.horizontalLayout_24.addWidget(self.bhgdata)
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.pushbhg = QtWidgets.QPushButton(self.horizontalLayoutWidget_3)
+        self.pushbhg.setObjectName("pushbhg")
+        self.verticalLayout_7.addWidget(self.pushbhg)
+        self.pushbhg.clicked.connect(self.show_message)
+        self.horizontalLayout_24.addLayout(self.verticalLayout_7)
+        self.horizontalLayoutWidget_4 = QtWidgets.QWidget(self.centralwidget)
+        self.horizontalLayoutWidget_4.setGeometry(QtCore.QRect(0, 570, 291, 31))
+        self.horizontalLayoutWidget_4.setObjectName("horizontalLayoutWidget_4")
+        self.horizontalLayout_25 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_4)
+        self.horizontalLayout_25.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_25.setObjectName("horizontalLayout_25")
+        self.creatfj = QtWidgets.QPushButton(self.horizontalLayoutWidget_4)
+        self.creatfj.setObjectName("creatfj")
+        self.horizontalLayout_25.addWidget(self.creatfj)
+        self.creatfj.clicked.connect(self.show_message)
+        self.creatbhg = QtWidgets.QPushButton(self.horizontalLayoutWidget_4)
+        self.creatbhg.setObjectName("creatbhg")
+        self.horizontalLayout_25.addWidget(self.creatbhg)
+        self.creatbhg.clicked.connect(self.show_message)
         self.listView_5.raise_()
         self.listView_4.raise_()
         self.listView_2.raise_()
@@ -378,6 +511,15 @@ class Ui_MainWindow(object):
         self.verticalLayoutWidget_3.raise_()
         self.label_23.raise_()
         self.pushButton_4.raise_()
+        self.listView_6.raise_()
+        self.label_21.raise_()
+        self.horizontalLayoutWidget.raise_()
+        self.label_24.raise_()
+        self.label_25.raise_()
+        self.horizontalLayoutWidget_2.raise_()
+        self.label_26.raise_()
+        self.horizontalLayoutWidget_3.raise_()
+        self.horizontalLayoutWidget_4.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -443,37 +585,46 @@ class Ui_MainWindow(object):
         self.login_wmsbutton.setText(_translate("MainWindow", "PushButton"))
         self.label_23.setText(_translate("MainWindow", "登录"))
         self.pushButton_4.setText(_translate("MainWindow", "一键执行接口自动化测试"))
+        self.label_21.setText(_translate("MainWindow", "GSP管理"))
+        self.getyhdata.setText(_translate("MainWindow", "获取养护商品"))
+        loop_count2 = 0
+        if self.get_yh_data() is not None:
+            for yh in self.get_yh_data():
+                self.yhdata.setItemText(loop_count2, _translate("MainWindow", yh["baseSku"]["skuName"]))
+        self.pushyh.setText(_translate("MainWindow", "一键创建"))
+        self.label_24.setText(_translate("MainWindow", "养护任务创建"))
+        self.label_25.setText(_translate("MainWindow", "复检通知单创建"))
+        self.getfjdata.setText(_translate("MainWindow", "获取复检商品"))
+        loop_count3 = 0
+        if self.get_fj_data() is not None:
+            for fj in self.get_fj_data():
+                self.fjdata.setItemText(loop_count3, _translate("MainWindow", fj["skuPo"]["skuName"]))
+        self.pushfj.setText(_translate("MainWindow", "一键创建"))
+        self.label_26.setText(_translate("MainWindow", "创建销毁作业"))
+        self.getbhgdata.setText(_translate("MainWindow", "获取不合格商品"))
+        loop_count4 = 0
+        if self.get_bhg_data() is not None:
+            for bhg in self.get_bhg_data():
+                self.bhgdata.setItemText(loop_count4, _translate("MainWindow", bhg["skuName"]))
+        self.pushbhg.setText(_translate("MainWindow", "一键创建"))
+        self.creatfj.setText(_translate("MainWindow", "创建复检商品"))
+        self.creatbhg.setText(_translate("MainWindow", "创建不合格产品"))
 
     def show_message(self):
         if QtWidgets.QWidget.sender(self) == self.rkorder:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_rk()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
+            self.start_long_task("入库")
         elif QtWidgets.QWidget.sender(self) == self.ysorder:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_ys()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
+            self.start_long_task("验收")
         elif QtWidgets.QWidget.sender(self) == self.ordersj:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_sj()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
+            self.start_long_task("上架")
         elif QtWidgets.QWidget.sender(self) == self.so:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_so()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
+            self.start_lout_task("so")
         elif QtWidgets.QWidget.sender(self) == self.jh:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_jh()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
-
+            self.start_lout_task("jh")
         elif QtWidgets.QWidget.sender(self) == self.bz_2:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_bz()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
+            self.start_lout_task("bz")
         elif QtWidgets.QWidget.sender(self) == self.fh:
-            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.warehouse_fh()}",
-                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
-                                                    QtWidgets.QMessageBox.Ok)
+            self.start_lout_task("fh")
         elif QtWidgets.QWidget.sender(self) == self.login_wmsbutton:
             button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.login_wms()}",
                                                     QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
@@ -494,12 +645,158 @@ class Ui_MainWindow(object):
             button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.get_supplier()}",
                                                     QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
                                                     QtWidgets.QMessageBox.Ok)
+        elif QtWidgets.QWidget.sender(self) == self.pushyh:
+            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.push_yh_data()}",
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+                                                    QtWidgets.QMessageBox.Ok)
+        elif QtWidgets.QWidget.sender(self) == self.pushfj:
+            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.push_fj_data()}",
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+                                                    QtWidgets.QMessageBox.Ok)
+        elif QtWidgets.QWidget.sender(self) == self.pushbhg:
+            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.push_bhg_data()}",
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+                                                    QtWidgets.QMessageBox.Ok)
+        elif QtWidgets.QWidget.sender(self) == self.creatbhg:
+            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.create_bhg_data()}",
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+                                                    QtWidgets.QMessageBox.Ok)
+        elif QtWidgets.QWidget.sender(self) == self.creatfj:
+            button = QtWidgets.QMessageBox.question(self, "执行结果", f"{self.create_dcl_data()}",
+                                                    QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel,
+                                                    QtWidgets.QMessageBox.Ok)
+
+    def start_long_task(self, task_type):
+        self.progressBar.show()  # 显示进度条
+        self.progressBar.setValue(0)  # 重置进度条
+
+        self.worker = Worker()  # 创建工作线程
+        self.worker.progress.connect(self.update_progress)  # 连接进度信号
+        self.worker.finished.connect(self.task_finished)  # 连接完成信号
+
+        # 根据任务类型执行不同的逻辑
+        if task_type == "验收":
+            self.worker.run = self.run_acceptance_task  # 将 run 方法指向验收任务
+        if task_type == "入库":
+            self.worker.run = self.run_rk_order_task
+        if task_type == "上架":
+            self.worker.run = self.run_rk_sj_task
+        # 可以添加其他任务类型的处理
+        self.worker.start()  # 启动线程
+
+    def start_lout_task(self, task_type):
+        self.progressBar_2.show()
+        self.progressBar_2.setValue(0)
+        self.worker = Worker()
+        self.worker.progress.connect(self.update_progress2)
+        self.worker.finished.connect(self.task_finished2)
+        if task_type == "so":
+            self.worker.run = self.run_so_task
+        if task_type == "jh":
+            self.worker.run = self.run_jh_task
+        if task_type == "bz":
+            self.worker.run = self.run_bz_task
+        if task_type == "fh":
+            self.worker.run = self.run_fh_task
+        self.worker.start()
+
+    def run_acceptance_task(self):
+        # 在这里调用验收的逻辑
+        wms_ys_data = self.warehouse_ys()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"验收执行结果：{wms_ys_data}")  # 发射完成信号
+
+    def run_rk_order_task(self):
+        run_ky_order_data = self.warehouse_rk()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"订单生成执行结果：{run_ky_order_data}")  # 发射完成信号
+
+    def run_rk_sj_task(self):
+        run_ky_js_data = self.warehouse_sj()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"上架执行结果：{run_ky_js_data}")  # 发射完成信号
+
+    def run_so_task(self):
+        run_so_data = self.warehouse_so()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"so生成执行结果：{run_so_data}")  # 发射完成信号
+
+    def run_jh_task(self):
+        run_so_data = self.warehouse_jh()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"拣货执行结果：{run_so_data}")  # 发射完成信号
+
+    def run_bz_task(self):
+        run_so_data = self.warehouse_bz()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"播种执行结果：{run_so_data}")  # 发射完成信号
+
+    def run_fh_task(self):
+        run_so_data = self.warehouse_fh()  # 调用验收逻辑
+        for i in range(101):  # 模拟进度更新
+            time.sleep(0.05)  # 模拟耗时操作
+            self.worker.progress.emit(i)  # 发射进度信号
+        self.worker.finished.emit(f"复核执行结果：{run_so_data}")  # 发射完成信号
+
+    def update_progress(self, value):
+        self.progressBar.setValue(value)  # 更新进度条的值
+
+    def task_finished(self, message):
+        self.progressBar.hide()  # 隐藏进度条
+        QtWidgets.QMessageBox.information(self.centralwidget, "完成", f"执行成功: {message}")
+        # 显示完成消息
+
+    def update_progress2(self, value):
+        self.progressBar_2.setValue(value)  # 更新进度条的值
+
+    def task_finished2(self, message):
+        self.progressBar_2.hide()  # 隐藏进度条
+        QtWidgets.QMessageBox.information(self.centralwidget, "完成", f"执行成功: {message}")
 
     def populate_company_combobox(self):
         companies = self.get_company()
         self.company.clear()
         for company in companies:
             self.company.addItem(company["companyName"])
+
+    def populate_yh_combobox(self):
+        if self.get_yh_data() is not None:
+            yh = self.get_yh_data()
+            self.yhdata.clear()
+            for yhdata in yh:
+                self.yhdata.addItem(yhdata["baseSku"]["skuName"])
+        else:
+            return self.yhdata.addItem("未获取到数据")
+
+    def populate_fj_combobox(self):
+        if self.get_fj_data() is not None:
+            fj = self.get_fj_data()
+            self.fjdata.clear()
+            for fjdata in fj:
+                self.fjdata.addItem(fjdata["skuPo"]["skuName"])
+        else:
+            return self.fjdata.addItem("未获取到数据")
+
+    def populate_bhg_combobox(self):
+        if self.get_bhg_data() is not None:
+            bhg = self.get_bhg_data()
+            self.bhgdata.clear()
+            for bhgdata in bhg:
+                self.bhgdata.addItem(bhgdata["skuName"])
+        else:
+            return self.bhgdata.addItem("未获取到数据")
 
     def populate_warehouse_combobox(self):
         warehousers = self.get_warhouse()
@@ -622,6 +919,13 @@ class Ui_MainWindow(object):
                                                 res = requests.post(url=url, json=data,
                                                                     headers={"Content-Type": "application/json"}).json()
                                                 if res['msg'] == "成功":
+                                                    write_yaml(base_path("config.yaml"), moudle_name="login_data",
+                                                               key="username",
+                                                               value=f"{self.login_wms_username.text()}")
+                                                    write_yaml(base_path("config.yaml"), moudle_name="login_data",
+                                                               key="password",
+                                                               value=f"{self.login_wms_password.text()}")
+
                                                     return {"token": res['obj']['token'],
                                                             "username": res['obj']['user']['userName'],
                                                             "userNo": res['obj']['user']['userNo']}
@@ -693,13 +997,13 @@ class Ui_MainWindow(object):
                             else:
                                 return {"创建状态": "创建失败", "result": result}
                     else:
-                        return {"错误信息": "产品名称不存在"}
+                        return {"创建状态": "产品名称不存在"}
                 else:
-                    return {"错误信息": "截止日期不能为空"}
+                    return {"创建状态": "截止日期不能为空"}
             else:
-                return {"错误信息": "起始日期不能为空"}
+                return {"创建状态": "起始日期不能为空"}
         else:
-            return {"错误信息": "产品名称不能为空"}
+            return {"创建状态": "产品名称不能为空"}
 
     def warehouse_ys(self):
         erpdata = self.warehouse_rk()  # 获取入库订单号
@@ -823,34 +1127,37 @@ class Ui_MainWindow(object):
         orderNo = self.lineEdit.text()
         business_type = self.outworkclass.currentText()
         sourl = f"http://{strip_control(self.host.text())}/wms_232/order/outOrder/add"
-        headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
-        sodata = so_data(order_type=outclass, num=outnum, bussinessType=business_type, orderNo=orderNo,
-                         out_sku=self.outsku.text())
-        so_res = requests.post(url=sourl, data=json.dumps(sodata), headers=headers).json()
-        if so_res['code'] == 200:
-            select_so_url = f"http://{strip_control(self.host.text())}/wms_232/order/outOrder/pageInfo"
-            select_so_data = {"origNo": f"{sodata['origNo']}", "orderByColumnList": None, "page": 1,
-                              "limit": 50}
-            select_result = requests.post(url=select_so_url, data=json.dumps(select_so_data),
-                                          headers=headers).json()
-            if select_result['msg'] == "成功":
-                for i in select_result['obj']:
-                    creat_so_url = f"http://{strip_control(self.host.text())}/wms_232/order/outOrder/createSo"
-                    creat_so_data = [f"{i['key']}"]
-                    creat_result = requests.post(url=creat_so_url, data=json.dumps(creat_so_data),
-                                                 headers=headers).json()
-                    if creat_result['code'] == 200:
-                        back_data = {"创建状态": "创建成功", "orderNo": orderNo, "outnum": outnum,
-                                     "outclass": outclass,
-                                     "business_type": business_type, "erp": sodata['origNo'],
-                                     "so_key": i['key']}
-                        return back_data
-                    else:
-                        return creat_result['msg']
+        if "token" in self.login_wms():
+            headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+            sodata = so_data(order_type=outclass, num=outnum, bussinessType=business_type, orderNo=orderNo,
+                             out_sku=self.outsku.text())
+            so_res = requests.post(url=sourl, data=json.dumps(sodata), headers=headers).json()
+            if so_res['code'] == 200:
+                select_so_url = f"http://{strip_control(self.host.text())}/wms_232/order/outOrder/pageInfo"
+                select_so_data = {"origNo": f"{sodata['origNo']}", "orderByColumnList": None, "page": 1,
+                                  "limit": 50}
+                select_result = requests.post(url=select_so_url, data=json.dumps(select_so_data),
+                                              headers=headers).json()
+                if select_result['msg'] == "成功":
+                    for i in select_result['obj']:
+                        creat_so_url = f"http://{strip_control(self.host.text())}/wms_232/order/outOrder/createSo"
+                        creat_so_data = [f"{i['key']}"]
+                        creat_result = requests.post(url=creat_so_url, data=json.dumps(creat_so_data),
+                                                     headers=headers).json()
+                        if creat_result['code'] == 200:
+                            back_data = {"创建状态": "创建成功", "orderNo": orderNo, "outnum": outnum,
+                                         "outclass": outclass,
+                                         "business_type": business_type, "erp": sodata['origNo'],
+                                         "so_key": i['key']}
+                            return back_data
+                        else:
+                            return creat_result['msg']
+                else:
+                    return select_result
             else:
-                return select_result
+                return {"创建状态": "创建失败", "result": so_res}
         else:
-            return {"创建状态": "创建失败", "result": so_res}
+            return {"创建状态": "未登录"}
 
     def warehouse_jh(self):
         soresult = self.warehouse_so()
@@ -933,13 +1240,15 @@ class Ui_MainWindow(object):
                                 get_pic_data = {}
                                 get_pic_result = requests.post(url=get_pic_url, data=get_pic_data,
                                                                headers=headers).json()
-                                print(jh_data['pickOrderNo'], get_pic_result['obj']['pickOrderNo'])
-                                if jh_data['pickOrderNo'] == get_pic_result['obj']['pickOrderNo']:
-                                    pick_url = f"http://{strip_control(self.host.text())}/wms_232/ob/pcPick/onekeyPick"
-                                    pick_data = [f"{get_pic_result['obj']['id']}"]
-                                    pick_result = requests.post(url=pick_url, data=json.dumps(pick_data),
-                                                                headers=headers).json()
-                                    return {"erpNo": soresult['erp'], "result": pick_result, "创建状态": "创建成功"}
+                                if get_pic_result['msg'] == "成功":
+                                    if jh_data['pickOrderNo'] == get_pic_result['obj']['pickOrderNo']:
+                                        pick_url = f"http://{strip_control(self.host.text())}/wms_232/ob/pcPick/onekeyPick"
+                                        pick_data = [f"{get_pic_result['obj']['id']}"]
+                                        pick_result = requests.post(url=pick_url, data=json.dumps(pick_data),
+                                                                    headers=headers).json()
+                                        return {"erpNo": soresult['erp'], "result": pick_result, "创建状态": "创建成功"}
+                                else:
+                                    return {"错误信息": "拣货单据超过5个，请拣货后在使用工具"}
                         else:
                             return waveReleaseResult
                     else:
@@ -998,6 +1307,302 @@ class Ui_MainWindow(object):
                         return wave_result
         else:
             return soresult
+
+    def get_yh_data(self):
+        if self.login_wms_username.text() != "":
+            headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+            url = f"http://{self.host.text()}/wms_232//gsp/pro/emphMaintain/queryInStockPro"
+            data = {"orderByColumnList": None, "isEnable": "1", "emphMaintainType": "PT",
+                    "maintainUser": f"{self.login_wms()['userNo']}",
+                    "maintainUserName": f"{self.login_wms()['username']}", "ownerId": "1770570116141568", "flag": 1,
+                    "orgId": None,
+                    "productFormType": "YP", "productCategory": None, "skuCategoryId": None, "zoneId": None,
+                    "lotId": None,
+                    "skuId": None, "maintainType": "ZD", "page": 1, "limit": 50}
+            yh_sku_data = requests.post(url=url, data=json.dumps(data), headers=headers).json()
+            if yh_sku_data['obj'] is not None:
+                return yh_sku_data['obj']
+            else:
+                return None
+        else:
+            return None
+
+    def push_yh_data(self):
+        headers = {"Content-Type": "application/json", "Authorization": self.login_wms()['token']}
+        get_yh_data_list_url = f"http://{strip_control(self.host.text())}/wms_232//gsp/pro/emphMaintain/queryInStockPro"
+        get_yh_data_list_data = {"orderByColumnList": None, "isEnable": "1", "emphMaintainType": "ZD",
+                                 "maintainUser": f"{self.login_wms()['userNo']}",
+                                 "maintainUserName": f"{self.login_wms()['username']}", "ownerId": "1770570116141568",
+                                 "flag": 1, "orgId": None, "productFormType": "YP", "maintainType": "ZD", "page": 1,
+                                 "limit": 50}
+        get_yh_data_list_result = requests.post(url=get_yh_data_list_url, data=json.dumps(get_yh_data_list_data),
+                                                headers=headers).json()
+        if get_yh_data_list_result['obj'][0] is not None:
+            print(get_yh_data_list_result['obj'][0])
+            print(type(get_yh_data_list_result['obj'][0]))
+            print(yh_data_list(get_yh_data_list_result['obj'][0]))
+            creat_yh_url = f"http://{strip_control(self.host.text())}/wms_232/gsp/pro/emphMaintain/add"
+            creat_yh_result = requests.post(url=creat_yh_url,
+                                            data=json.dumps(yh_data_list(get_yh_data_list_result['obj'][0])),
+                                            headers=headers).json()
+            if creat_yh_result['code'] == 200 and creat_yh_result['msg'] == "成功":
+                return {"创建状态": "创建成功"}
+            else:
+                return creat_yh_result
+        else:
+            return {"无可创建的养护商品，请点击创建养护商品按钮"}
+
+    def get_fj_data(self):
+        if self.login_wms_username.text() != "":
+            headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+            url = f"http://{self.host.text()}/wms_232//gsp/recheck/queryRecheckList"
+            data = {"isEnable": "1", "ownerId": "1770570116141568", "flag": 1, "productFormType": "YP",
+                    "productCategory": None, "skuCategoryId": None, "zoneId": None, "lotId": None, "skuId": None,
+                    "orderByColumnList": None, "page": 1, "limit": 50}
+            fj_data = requests.post(url=url, data=json.dumps(data), headers=headers).json()
+            if fj_data['obj'] is not None:
+                return fj_data['obj']
+            else:
+                return None
+        else:
+            return None
+
+    def push_fj_data(self):
+        headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+        url = f"http://{self.host.text()}/wms_232//gsp/recheck/queryRecheckList"
+        data = {"isEnable": "1", "ownerId": "1770570116141568", "flag": 1, "productFormType": "YP",
+                "productCategory": None, "skuCategoryId": None, "zoneId": None, "lotId": None, "skuId": None,
+                "orderByColumnList": None, "page": 1, "limit": 50}
+        fj_data_result = requests.post(url=url, data=json.dumps(data), headers=headers).json()
+        if fj_data_result['obj'][0] is not None:
+            print(fj_data(fj_data_result['obj'][0]))
+            print(type(fj_data(fj_data_result['obj'][0])))
+            creat_fj_url = f"http://{strip_control(self.host.text())}/wms_232//gsp/recheck/add"
+            creat_fj_result = requests.post(url=creat_fj_url,
+                                            data=json.dumps(fj_data(fj_data_result['obj'][0])),
+                                            headers=headers).json()
+            if creat_fj_result['code'] == 200 and creat_fj_result['msg'] == "成功":
+                return {"创建状态": "创建成功"}
+            else:
+                return creat_fj_result
+        else:
+            return {"无可创建的养护商品，请点击创建养护商品按钮"}
+
+    def get_bhg_data(self):
+        if self.login_wms_username.text() != "":
+            headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+            url = f"http://{self.host.text()}/wms_232//gsp/ncr/queryStock"
+            data = {"isEnable": "1", "emphMaintainType": "PT", "maintainUser": "lhb001", "maintainUserName": "李鸿宾",
+                    "orgId": None, "ownerId": "1770570116141568", "flag": 1, "productFormType": "YP",
+                    "isLogisticsCompensation": "Y", "isShowFlag": True, "skuId": None, "zoneId": None, "lotId": None,
+                    "productionBatch": None, "page": 1, "limit": 50, "orderByColumnList": None, "stockStatus": "BHG"}
+            bhg_data = requests.post(url=url, data=json.dumps(data), headers=headers).json()
+            if bhg_data['obj'] is not None:
+                return bhg_data['obj']
+            else:
+                return None
+        else:
+            return None
+
+    def push_bhg_data(self):
+        headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+        url = f"http://{self.host.text()}/wms_232//gsp/ncr/queryStock"
+        data = {"isEnable": "1", "emphMaintainType": "PT", "maintainUser": "lhb001", "maintainUserName": "李鸿宾",
+                "orgId": None, "ownerId": "1770570116141568", "flag": 1, "productFormType": "YP",
+                "isLogisticsCompensation": "Y", "isShowFlag": True, "skuId": None, "zoneId": None, "lotId": None,
+                "productionBatch": None, "page": 1, "limit": 50, "orderByColumnList": None, "stockStatus": "BHG"}
+        bhg_result = requests.post(url=url, data=json.dumps(data), headers=headers).json()
+        if bhg_result['obj'][-1] is not None:
+            creat_bhg_url = f"http://{strip_control(self.host.text())}/wms_232//gsp/ncr/add"
+            creat_bhg_result = requests.post(url=creat_bhg_url,
+                                             data=json.dumps(get_bhg_data(bhg_result['obj'][-1])),
+                                             headers=headers).json()
+            if creat_bhg_result['code'] == 200 and creat_bhg_result['msg'] == "成功":
+                get_approval_data_url = "http://192.168.111.232:17777/wms_232/gsp/ncr/pageInfo"
+                get_approval_data_data = {}
+                get_approval_data_result = requests.post(url=get_approval_data_url, json=get_approval_data_data,
+                                                         headers=headers).json()
+                approval_url = f"http://192.168.111.232:17777/wms_232/gsp/ncr/audit/{get_approval_data_result['obj'][0]['id']}"
+                approval_data = {}
+                approval_result = requests.post(url=approval_url, json=approval_data, headers=headers).json()
+                if approval_result['msg'] == "成功":
+                    erp_approval_url = "http://192.168.111.232:17777/oms_232/api/erp/ncr/reBackNcr"
+                    data = {
+                        "origCompanyCode": "ZHQC",
+                        "origWarehouseCode": "MRCK",
+                        "ncrNo": f"{get_approval_data_result['obj'][0]['ncrNo']}",
+                        "origSys": "CQ_ERP",
+                        "replyUser": "李鸿宾",
+                        "replyDate": "2024-08-29 14:00:00",
+                        "replyDept": "个人事业部",
+                        "replyNotes": "全部同意",
+                        "dtList": [
+                            {
+                                "rowNo": "1",
+                                "agreeQty": f'{bhg_result["obj"][-1]["usableQty"]}',
+                                "erpReportCode": "ERP-111111"
+                            }
+                        ]
+                    }
+                    erp_approval_result = requests.post(url=erp_approval_url, json=data, headers=headers).json()
+                    if erp_approval_result['code'] == 200 and erp_approval_result['msg'] == "成功":
+                        return {"销毁作业创建状态": "创建成功"}
+                    else:
+                        return erp_approval_result
+                else:
+                    return {"ERROR": "审批失败"}
+            else:
+                return creat_bhg_result
+        else:
+            return {"无可创建的养护商品，请点击创建养护商品按钮"}
+
+    def create_bhg_data(self):
+        erpdata = self.warehouse_rk()
+        yadata = self.warehouse_ys()
+        if yadata["创建状态"] == "创建成功":
+            asnNO = yadata['asnNO']
+            headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+            qc_key_url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/pageInfo"
+            qc_key_data = {"orderByColumnList": None, "createTimeFm": None, "createTimeTo": None,
+                           "skuCategoryIdList": None, "origNo": None, "asnNo": f"{asnNO}", "page": 1,
+                           "limit": 50}
+            qc_key = requests.post(url=qc_key_url, json=qc_key_data, headers=headers).json()
+            for a in qc_key['obj']:
+                yd_url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/initUpdate/{a['key']}"
+                headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+                ya_result = requests.post(url=yd_url, data=None, headers=headers).json()
+                if ya_result['msg'] == "成功":
+                    qc_data = ya_result['obj']['entity']['qcDtList']
+                    for i in qc_data:
+                        qcid = i['qcId']
+                        qcno = i['qcNo']
+                        batchno = i['batchNo']
+                        query_ys_url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/queryUserNotFinishQcDt"
+                        query_ys_data = {"qcId": qcid}
+                        query_result = requests.post(url=query_ys_url, data=json.dumps(query_ys_data),
+                                                     headers=headers).json()
+                        if query_result['msg'] == "成功":
+                            for query_data in query_result['obj']['waitQcDtList']:
+                                productionBatch = query_data['commonInvBatch']['productionBatch']
+                                qcdtid = query_data['qcDtId']
+                                sjdata = sj(qcid=qcid, qcNo=qcno, num=int(self.order_num.text()), batchNo=batchno,
+                                            asnNo=asnNO,
+                                            row=yadata['X_ROW_KEY'], productionBatch=productionBatch, qcdtid=qcdtid,
+                                            pruduct_name=self.sku.text())
+                                sjdata['checkResult'] = "BHG"
+                                sjdata['checkResultDesc'] = "BZJYPS"
+                                sjdata['handleMeasure'] = "BS"
+                                url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/saveQc"
+                                result = requests.post(url=url, data=json.dumps(sjdata), headers=headers).json()
+                                select_sj_data_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/queryNotAssignedPutShelfTask"
+                                select_sj_data_data = {"orderNo": f"{a['erpOrderNo']}"}
+                                select_sj_data_result = requests.post(url=select_sj_data_url, json=select_sj_data_data,
+                                                                      headers=headers).json()
+                                receive_sj_task_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/receiveTask"
+                                receive_sj_task_data = {"putShelfId": select_sj_data_result['obj'][0]['key']}
+                                receive_sj_task_result = requests.post(url=receive_sj_task_url,
+                                                                       json=receive_sj_task_data,
+                                                                       headers=headers).json()
+                                if receive_sj_task_result['code'] == 200:
+                                    get_receive_data_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/queryUserNotFinishPutShelfTaskDt"
+                                    get_receive_data_data = {"putShelfId": select_sj_data_result['obj'][0]['key']}
+                                    get_receive_data_result = requests.post(url=get_receive_data_url,
+                                                                            json=get_receive_data_data,
+                                                                            headers=headers).json()
+                                    if get_receive_data_result['msg'] == "成功":
+                                        dt_list = get_receive_data_result['obj']["waitPutShelfTaskDtList"]
+                                        dt_list[0]['_X_ROW_KEY'] = erpdata['_X_ROW_KEY']
+                                        receive_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/savePutShelf"
+                                        receive_data = {"dtList": dt_list}
+                                        receive_result = requests.post(url=receive_url, json=receive_data,
+                                                                       headers=headers).json()
+                                        if receive_result['code'] == 200:
+                                            return {"创建状态": "创建成功"}
+                                    else:
+                                        return get_receive_data_result
+                                else:
+                                    return receive_sj_task_result
+
+                        else:
+                            return query_result
+                else:
+                    return ya_result
+        else:
+            return erpdata
+
+    def create_dcl_data(self):
+        erpdata = self.warehouse_rk()
+        yadata = self.warehouse_ys()
+        if yadata["创建状态"] == "创建成功":
+            asnNO = yadata['asnNO']
+            headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+            qc_key_url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/pageInfo"
+            qc_key_data = {"orderByColumnList": None, "createTimeFm": None, "createTimeTo": None,
+                           "skuCategoryIdList": None, "origNo": None, "asnNo": f"{asnNO}", "page": 1,
+                           "limit": 50}
+            qc_key = requests.post(url=qc_key_url, json=qc_key_data, headers=headers).json()
+            for a in qc_key['obj']:
+                yd_url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/initUpdate/{a['key']}"
+                headers = {"Authorization": self.login_wms()['token'], "Content-Type": "application/json"}
+                ya_result = requests.post(url=yd_url, data=None, headers=headers).json()
+                if ya_result['msg'] == "成功":
+                    qc_data = ya_result['obj']['entity']['qcDtList']
+                    for i in qc_data:
+                        qcid = i['qcId']
+                        qcno = i['qcNo']
+                        batchno = i['batchNo']
+                        query_ys_url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/queryUserNotFinishQcDt"
+                        query_ys_data = {"qcId": qcid}
+                        query_result = requests.post(url=query_ys_url, data=json.dumps(query_ys_data),
+                                                     headers=headers).json()
+                        if query_result['msg'] == "成功":
+                            for query_data in query_result['obj']['waitQcDtList']:
+                                productionBatch = query_data['commonInvBatch']['productionBatch']
+                                qcdtid = query_data['qcDtId']
+                                sjdata = sj(qcid=qcid, qcNo=qcno, num=int(self.order_num.text()), batchNo=batchno,
+                                            asnNo=asnNO,
+                                            row=yadata['X_ROW_KEY'], productionBatch=productionBatch, qcdtid=qcdtid,
+                                            pruduct_name=self.sku.text())
+                                sjdata['checkResult'] = "DCL"
+                                sjdata['checkResultDesc'] = "BZJYPS"
+                                # sjdata['handleMeasure'] = "BS"
+                                url = f"http://{strip_control(self.host.text())}/wms_232/ib/qc/saveQc"
+                                result = requests.post(url=url, data=json.dumps(sjdata), headers=headers).json()
+                                select_sj_data_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/queryNotAssignedPutShelfTask"
+                                select_sj_data_data = {"orderNo": f"{a['erpOrderNo']}"}
+                                select_sj_data_result = requests.post(url=select_sj_data_url, json=select_sj_data_data,
+                                                                      headers=headers).json()
+                                receive_sj_task_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/receiveTask"
+                                receive_sj_task_data = {"putShelfId": select_sj_data_result['obj'][0]['key']}
+                                receive_sj_task_result = requests.post(url=receive_sj_task_url,
+                                                                       json=receive_sj_task_data,
+                                                                       headers=headers).json()
+                                if receive_sj_task_result['code'] == 200:
+                                    get_receive_data_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/queryUserNotFinishPutShelfTaskDt"
+                                    get_receive_data_data = {"putShelfId": select_sj_data_result['obj'][0]['key']}
+                                    get_receive_data_result = requests.post(url=get_receive_data_url,
+                                                                            json=get_receive_data_data,
+                                                                            headers=headers).json()
+                                    if get_receive_data_result['msg'] == "成功":
+                                        dt_list = get_receive_data_result['obj']["waitPutShelfTaskDtList"]
+                                        dt_list[0]['_X_ROW_KEY'] = erpdata['_X_ROW_KEY']
+                                        receive_url = "http://192.168.111.232:17777/wms_232/ib/putShelf/savePutShelf"
+                                        receive_data = {"dtList": dt_list}
+                                        receive_result = requests.post(url=receive_url, json=receive_data,
+                                                                       headers=headers).json()
+                                        if receive_result['code'] == 200:
+                                            return {"创建状态": "创建成功"}
+                                    else:
+                                        return get_receive_data_result
+                                else:
+                                    return receive_sj_task_result
+
+                        else:
+                            return query_result
+                else:
+                    return ya_result
+        else:
+            return erpdata
 
     def open_test_runer(self):
         self.test_runner_window = TestRunerWindow(self.host.text(), self.login_wms())  # 创建 TestRunner 窗口实例

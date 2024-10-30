@@ -201,7 +201,7 @@ def asn_data(order_num, producttype, pruduct_name, supplier_name):
         "_X_ROW_KEY": "row_236",
         "dtList": [
             {
-                "key": "null",
+                "key": "None",
                 "companyCode": None,
                 "whId": None,
                 "id": None,
@@ -400,7 +400,7 @@ def ys_data(asnid, asnno, inorder, erpno, ordertype, asndtid, commodityQty, xrow
                 },
                 "asnDtId": asndtid,
                 "skuId": f"{data_result['id']}",
-                "skuCode": f"{data_result['sys_sku_code']}",
+                "skuCode": f"{data_result['sku_code']}",
                 "commodityQty": commodityQty,
                 "alreadyRecQty": 0,
                 "waitRecQty": commodityQty,
@@ -482,7 +482,7 @@ def ys_data(asnid, asnno, inorder, erpno, ordertype, asndtid, commodityQty, xrow
                 },
                 "asnDtId": asndtid,
                 "skuId": f"{data_result['id']}",
-                "skuCode": f"{data_result['sys_sku_code']}",
+                "skuCode": f"{data_result['sku_code']}",
                 "commodityQty": commodityQty,
                 "alreadyRecQty": 0,
                 "waitRecQty": commodityQty,
@@ -535,7 +535,7 @@ def sj(qcid, qcNo, num, batchNo, asnNo, row, productionBatch, qcdtid, pruduct_na
     data = {
         "dtList": [
             {
-                "key": "null",
+                "key": "None",
                 "companyCode": None,
                 "whId": None,
                 "id": None,
@@ -841,6 +841,171 @@ def so_data(order_type, orderNo, num, bussinessType, out_sku):
                 "limitValid": 0,
                 "_X_ROW_KEY": "row_243"
             }
+        ]
+    }
+    return data
+
+
+def yh_data_list(dt_list):
+    yh_data_old = {"ownerName": None,
+                   "barcode": f"{dt_list['baseSku']['barcode']}",
+                   "skuName": f"{dt_list['baseSku']['skuName']}",
+                   "skuCategoryId": None,
+                   "skuCategoryName": f"{dt_list['baseSku']['skuCategoryName']}",
+                   "skuCategoryCode": None,
+                   "skuBigCategoryCode": None,
+                   "skuBigCategoryName": None,
+                   "spec": f"{dt_list['baseSku']['spec']}",
+                   "mainUnit": f"{dt_list['baseSku']['mainUnit']}",
+                   "perQty": dt_list['baseSku']['perQty'],
+                   "originCountry": "",
+                   "drugForm": "_",
+                   "tradeName": f"{dt_list['baseSku']['tradeName']}",
+                   "approvalNumber": f"{dt_list['baseSku']['approvalNumber']}",
+                   "brandName": "",
+                   "mfgName": None,
+                   "mfg": None,
+                   "permitHolder": "",
+                   "tempControl": "CW",
+                   "validityDay": 0,
+                   "tempControlName": "常温",
+                   "tempMax": None,
+                   "tempMin": None,
+                   "mnemonicCode": None,
+                   "instrumentModel": None,
+                   "productionBatch": f"{dt_list['baseInvBatch']['productionBatch']}",
+                   "productionDate": f"{dt_list['baseInvBatch']['productionDate']}",
+                   "instoreDate": f"{dt_list['baseInvBatch']['instoreDate']}",
+                   "invalidDate": f"{dt_list['baseInvBatch']['invalidDate']}",
+                   "sterileInvaliDate": "",
+                   "sterileNo": "",
+                   "asnNo": None,
+                   "batchAsnNo": None,
+                   "po": None,
+                   "unitPrice": None,
+                   "spellBoxSign": None,
+                   "volume": None,
+                   "weight": None,
+                   "packQty": None,
+                   "_X_ROW_KEY": "row_223"}
+    yh_data = {**dt_list, **yh_data_old}
+    data = {
+        "isEnable": "1",
+        "emphMaintainType": "ZD",
+        "maintainUser": "lhb001",
+        "maintainUserName": "李鸿宾",
+        "ownerId": "1770570116141568",
+        "flag": 1,
+        "orgId": None,
+        "productFormType": "YP",
+        "productCategory": None,
+        "skuCategoryId": None,
+        "zoneId": None,
+        "lotId": None,
+        "skuId": None,
+        "delDtIds": [],
+        "dtList": [
+            yh_data
+        ]
+    }
+    return data
+
+
+def fj_data(dt_list):
+    fj_data_old = {"skuId": dt_list['skuPo']['skuId'],
+                   "skuCode": f"{dt_list['skuPo']['skuCode']}",
+                   "barcode": f"{dt_list['skuPo']['barcode']}",
+                   "skuName": f"{dt_list['skuPo']['skuName']}",
+                   "skuCategoryId": None,
+                   "skuCategoryName": f"{dt_list['skuPo']['skuCategoryName']}",
+                   "skuCategoryCode": f"{dt_list['skuPo']['skuCategoryCode']}",
+                   "skuBigCategoryCode": f"{dt_list['skuPo']['skuBigCategoryCode']}",
+                   "skuBigCategoryName": f"{dt_list['skuPo']['skuBigCategoryName']}",
+                   "spec": f"{dt_list['skuPo']['spec']}",
+                   "mainUnit": f"{dt_list['skuPo']['mainUnit']}",
+                   "originCountry": "",
+                   "drugForm": "_",
+                   "tradeName": f"{dt_list['skuPo']['tradeName']}",
+                   "approvalNumber": f"{dt_list['skuPo']['approvalNumber']}",
+                   "brandName": "",
+                   "mfgName": None,
+                   "mfg": None,
+                   "permitHolder": "",
+                   "tempControl": f"{dt_list['skuPo']['tempControl']}",
+                   "validityDay": None,
+                   "tempControlName": f"{dt_list['skuPo']['tempControlName']}",
+                   "tempMax": None,
+                   "tempMin": None,
+                   "instrumentModel": None,
+                   "batchNo": f"{dt_list['baseInvBatch']['batchNo']}",
+                   "productionBatch": f"{dt_list['baseInvBatch']['productionBatch']}",
+                   "productionDate": f"{dt_list['baseInvBatch']['productionDate']}",
+                   "instoreDate": f"{dt_list['baseInvBatch']['instoreDate']}",
+                   "invalidDate": f"{dt_list['baseInvBatch']['invalidDate']}",
+                   "sterileInvaliDate": "",
+                   "sterileNo": "",
+                   "batchAsnNo": f"{dt_list['baseInvBatch']['batchAsnNo']}",
+                   "po": None,
+                   "unitPrice": 1,
+                   "spellBoxSign": "",
+                   "volume": dt_list['baseInvBatch']['volume'],
+                   "weight": dt_list['baseInvBatch']['weight'],
+                   "packQty": None,
+                   "stockInfoId": f"{dt_list['key']}",
+                   "stockId": f"{dt_list['key']}",
+                   "_X_ROW_KEY": "row_122",
+                   "recheckQty": f"{dt_list['usableQty']}",
+                   "recheckReason": "GXQ"}
+    fj_data_list = {**dt_list, **fj_data_old}
+    data = {
+        "isEnable": "1",
+        "ownerId": "1770570116141568",
+        "flag": 1,
+        "productFormType": "YP",
+        "productCategory": None,
+        "skuCategoryId": None,
+        "zoneId": None,
+        "lotId": None,
+        "skuId": None,
+        "delDtIds": [],
+        "dtList": [
+            fj_data_list
+        ]
+    }
+    return data
+
+
+def get_bhg_data(dt_list):
+    bhg_data_old = {"key": 0.09378168339343351,
+                    "approvalNumber": f"{dt_list['approveNo']}",
+                    "originZoneName": f"{dt_list['zoneName']}",
+                    "originLotName": f"{dt_list['lotCode']}",
+                    "packFactoryName": None,
+                    "stockId": dt_list['stockInfoId'],
+                    "_X_ROW_KEY": "row_132",
+                    "badQty": f"{dt_list['usableQty']}",
+                    "compensationAmount": 1,
+                    "badReason": "GXQ",
+                    "dealMsg": "XH"}
+    bhg_data_list = {**dt_list, **bhg_data_old}
+    data = {
+        "isEnable": "1",
+        "emphMaintainType": "PT",
+        "maintainUser": "lhb001",
+        "maintainUserName": "李鸿宾",
+        "orgId": None,
+        "ownerId": "1770570116141568",
+        "flag": 1,
+        "productFormType": "YP",
+        "isLogisticsCompensation": "N",
+        "isShowFlag": False,
+        "skuId": None,
+        "zoneId": None,
+        "lotId": None,
+        "productionBatch": None,
+        "deleteDtIds": [],
+        "dtList": [
+            bhg_data_list
         ]
     }
     return data

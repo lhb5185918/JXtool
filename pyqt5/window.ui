@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1117</width>
-    <height>796</height>
+    <width>1162</width>
+    <height>797</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>30</x>
       <y>70</y>
       <width>249</width>
-      <height>170</height>
+      <height>196</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -124,6 +124,13 @@
       </layout>
      </item>
      <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QPushButton" name="rkorder">
@@ -182,10 +189,10 @@
    <widget class="QListView" name="listView">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>1</x>
       <y>40</y>
-      <width>271</width>
-      <height>201</height>
+      <width>300</width>
+      <height>280</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -195,10 +202,10 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>70</y>
-      <width>332</width>
-      <height>167</height>
+      <x>330</x>
+      <y>74</y>
+      <width>271</width>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -300,6 +307,13 @@
       </layout>
      </item>
      <item>
+      <widget class="QProgressBar" name="progressBar_2">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
         <widget class="QPushButton" name="so">
@@ -368,10 +382,10 @@
    <widget class="QListView" name="listView_2">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>320</x>
       <y>40</y>
-      <width>351</width>
-      <height>201</height>
+      <width>300</width>
+      <height>280</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -639,7 +653,7 @@
    <widget class="QPushButton" name="pushButton_4">
     <property name="geometry">
      <rect>
-      <x>860</x>
+      <x>910</x>
       <y>490</y>
       <width>158</width>
       <height>23</height>
@@ -655,7 +669,7 @@
    <widget class="QListView" name="listView_5">
     <property name="geometry">
      <rect>
-      <x>830</x>
+      <x>890</x>
       <y>460</y>
       <width>211</width>
       <height>91</height>
@@ -664,6 +678,212 @@
     <property name="styleSheet">
      <string notr="true">background-color: rgb(85, 170, 255);</string>
     </property>
+   </widget>
+   <widget class="QListView" name="listView_6">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>330</y>
+      <width>300</width>
+      <height>280</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(201, 224, 255);</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_21">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>340</y>
+      <width>54</width>
+      <height>12</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>GSP管理</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>380</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_22">
+     <item>
+      <widget class="QPushButton" name="getyhdata">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(85, 170, 255);</string>
+       </property>
+       <property name="text">
+        <string>获取养护商品</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="yhdata"/>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QPushButton" name="pushyh">
+         <property name="text">
+          <string>一键创建</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_24">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>360</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>养护任务创建</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_25">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>430</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>复检通知单创建</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>450</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_23">
+     <item>
+      <widget class="QPushButton" name="getfjdata">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(85, 170, 255);</string>
+       </property>
+       <property name="text">
+        <string>获取复检商品</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="fjdata"/>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QPushButton" name="pushfj">
+         <property name="text">
+          <string>一键创建</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_26">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>500</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>获取不合格产品</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>520</y>
+      <width>291</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_24">
+     <item>
+      <widget class="QPushButton" name="getbhgdata">
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(85, 170, 255);</string>
+       </property>
+       <property name="text">
+        <string>获取不合格商品</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="bhgdata"/>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QPushButton" name="pushbhg">
+         <property name="text">
+          <string>一键创建</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_4">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>570</y>
+      <width>291</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_25">
+     <item>
+      <widget class="QPushButton" name="creatfj">
+       <property name="text">
+        <string>创建复检商品</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="creatbhg">
+       <property name="text">
+        <string>创建不合格产品</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <zorder>listView_5</zorder>
    <zorder>listView_4</zorder>
@@ -680,6 +900,15 @@
    <zorder>verticalLayoutWidget_3</zorder>
    <zorder>label_23</zorder>
    <zorder>pushButton_4</zorder>
+   <zorder>listView_6</zorder>
+   <zorder>label_21</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
+   <zorder>label_24</zorder>
+   <zorder>label_25</zorder>
+   <zorder>horizontalLayoutWidget_2</zorder>
+   <zorder>label_26</zorder>
+   <zorder>horizontalLayoutWidget_3</zorder>
+   <zorder>horizontalLayoutWidget_4</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
