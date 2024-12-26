@@ -1,16 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files
-block_cipher = None
-datas = collect_data_files('pypinyin') + [('testcase', 'testcase')]+[("config.yaml",".")]
 
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=datas,
+    datas=[],
     hiddenimports=[],
-    hookspath=['./testcase'],
+    hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
@@ -26,7 +23,7 @@ exe = EXE(
     a.datas,
     [],
     name='main',
-    debug=True,
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,

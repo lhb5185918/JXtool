@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
 # from pyqt5.window import Ui_MainWindow      # example这里是你的命名文件
-from datalist.ceshi1 import Ui_MainWindow
+from datalist.ceshi2 import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
